@@ -353,11 +353,6 @@ contract VestingVault is Ownable {
     function sort(address user) private{
        quickSort(grants[user].scheduleTimes, int(0), int(grants[user].scheduleTimes.length - 1), grants[user].scheduleValues);
     }
-
-    // function publicSort(uint256[] memory array, uint256[] memory arrayVal) public pure returns (uint256[] memory, uint256[] memory) {
-    //    quickSort(array, int(0), int(array.length - 1), arrayVal);
-    //    return (array, arrayVal);
-    // }
     
     function quickSort(uint256[] storage arr, int left, int right, uint256[] storage arrVal) private{
         int i = left;
