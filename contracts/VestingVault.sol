@@ -87,7 +87,7 @@ contract VestingVault is Ownable {
      * @return grant that represents vested info for specific user;
      */
     function returnGrantInfo(address _user)
-    public view returns (uint, uint, uint, uint, uint[] memory, uint[] memory, uint, uint) {
+    public view returns (uint, uint, uint, uint, uint[] memory, uint[] memory, uint, uint, uint) {
         require(_user != address(0), "Address should not be zero");
         Grant storage grant = grants[_user];
 
@@ -115,7 +115,7 @@ contract VestingVault is Ownable {
         // make sure a single address can be granted tokens only once.
         // require(grants[_to].value == 0, "Already added to vesting vault");
         // make sure a single address can be granted tokens only twice.
-        require(grants[_to].grantedCount < 2, "Already added to vesting vault");
+        // require(grants[_to].grantedCount < 2, "Already added to vesting vault");
 
         if (grants[_to].value == 0) {
           
@@ -157,29 +157,29 @@ contract VestingVault is Ownable {
 
             if (grants[_to].level == 2) {
 
-                uint length = grants[_to].scheduleTimes.length;
-                require(_start > grants[_to].scheduleTimes[length - 1], "Second starting time should be greater than the last schedule time.");
-                require(_scheduleTimes[0] > grants[_to].scheduleTimes[length - 1], "Second starting time should be greater than the last schedule time.");
+                // uint length = grants[_to].scheduleTimes.length;
+                // require(_scheduleTimes[0] > grants[_to].scheduleTimes[length - 1], "Second starting time should be greater than the last schedule time.");
                 require(_scheduleTimes.length == _scheduleValues.length, "Schedule Times and Values should be matched");
                 
                 _value = 0;
                 for (uint i = 0; i < _scheduleTimes.length; i++) {
-                    require(_scheduleTimes[i] > 0, "Seconds Amount of ScheduleTime should be greater than zero");
-                    require(_scheduleValues[i] > 0, "Amount of ScheduleValue should be greater than zero");
-                    if (i > 0) {
-                        require(_scheduleTimes[i] > _scheduleTimes[i - 1], "ScheduleTimes should be sorted by ASC");
-                    }
+                    // require(_scheduleTimes[i] > 0, "Seconds Amount of ScheduleTime should be greater than zero");
+                    // require(_scheduleValues[i] > 0, "Amount of ScheduleValue should be greater than zero");
+                    
+                    // if (i > 0) {
+                    //     require(_scheduleTimes[i] > _scheduleTimes[i - 1], "ScheduleTimes should be sorted by ASC");
+                    // }
 
                     grants[_to].scheduleTimes.push(_scheduleTimes[i]);
                     grants[_to].scheduleValues.push(_scheduleValues[i]);
                     _value = _value.add(_scheduleValues[i]);
                 } 
+                sort(_to);
             }
 
             require(_value > 0, "Vested amount should be greater than zero");
 
             grants[_to].value = grants[_to].value + _value;
-            // grants[_to].vestingStart = grants[_to].vestingStart + _start;
             grants[_to].vestingDuration = grants[_to].vestingDuration + _duration;
             grants[_to].vestingCliff = grants[_to].vestingCliff + _cliff;
             grants[_to].grantedCount = grants[_to].grantedCount + 1;
@@ -347,5 +347,36 @@ contract VestingVault is Ownable {
         require(!locked);
         locked = true;
         emit LockedVault();
+    }
+
+
+    function sort(address user) private{
+       quickSort(grants[user].scheduleTimes, int(0), int(grants[user].scheduleTimes.length - 1), grants[user].scheduleValues);
+    }
+
+    // function publicSort(uint256[] memory array, uint256[] memory arrayVal) public pure returns (uint256[] memory, uint256[] memory) {
+    //    quickSort(array, int(0), int(array.length - 1), arrayVal);
+    //    return (array, arrayVal);
+    // }
+    
+    function quickSort(uint256[] storage arr, int left, int right, uint256[] storage arrVal) private{
+        int i = left;
+        int j = right;
+        if(i==j) return;
+        uint256 pivot = arr[uint(left + (right - left) / 2)];
+        while (i <= j) {
+            while (arr[uint(i)] < pivot) i++;
+            while (pivot < arr[uint(j)]) j--;
+            if (i <= j) {
+                (arr[uint(i)], arr[uint(j)]) = (arr[uint(j)], arr[uint(i)]);
+                (arrVal[uint(i)], arrVal[uint(j)]) = (arrVal[uint(j)], arrVal[uint(i)]);
+                i++;
+                j--;
+            }
+        }
+        if (left < j)
+            quickSort(arr, left, j, arrVal);
+        if (i < right)
+            quickSort(arr, i, right, arrVal);
     }
 }

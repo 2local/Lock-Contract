@@ -20,9 +20,9 @@ module.exports = function (deployer, network) {
         web3.personal.unlockAccount(web3.eth.accounts[0], process.env.PASSWORD);
     }
 
-    deployer.deploy(VestingVault, '0xB5724B53eb7aC074a91Ef80bf2af30D8DA6424D2').then(() => {
+    deployer.deploy(VestingVault, '0x11f6ecc9e2658627e0876212f1078b9f84d3196e').then(() => {
         console.log('--------------------------------------------------------');
-        console.log('[VestingVault] contract deployed: ', LocalToken.address);
+        console.log('[VestingVault] contract deployed: ', '0x11f6ecc9e2658627e0876212f1078b9f84d3196e');
         // return deployer.deploy(LocalTokenDistribution, LocalToken.address, VestingVault.address).then(() => {
         //     console.log('--------------------------------------------------------');
         //     console.log('[LocalTokenDistribution] contract deployed: ', LocalTokenDistribution.address);
